@@ -1,11 +1,48 @@
 import { useGSAP } from "@gsap/react";
-import Button from "../components/Button";
 import Card from "../components/Card";
-// import CheckInn from "../components/CheckInn";
 import Table from "../components/Table";
 import gsap from "gsap";
 import { useState } from "react";
+import QuickActions from "../components/QuickActions";
+import { useHotelStore } from "../utility/store";
+import {
+  getTodayAvailableCountWithoutReservation,
+  getTodayCheckedIn,
+  getTodayReservedRooms,
+  getTodayStays,
+  getTodayStaysCount,
+  haveToCheckOutCount,
+} from "../utility/functions";
+
+export type GuestInRoom = {
+  propertyId: number;
+  room: number | null;
+  type: string;
+  guestName: string;
+  guestId: string;
+  checkIn: string;
+  checkOut: string;
+  dueAmount: number;
+};
+
 const Dashboard = () => {
+  const allocatedRooms = useHotelStore((s) => s.allocatedRooms);
+  const todaysRooms = getTodayStays(
+    allocatedRooms,
+    new Date().toLocaleDateString("en-CA")
+  );
+
+  const rooms = useHotelStore((state) => state.rooms);
+  const todayInHouse = getTodayStaysCount(rooms);
+  const todayReservations = getTodayReservedRooms(allocatedRooms);
+  const todayAvailableRooms =
+    getTodayAvailableCountWithoutReservation(rooms) - todayReservations;
+  const haveToCheckoutToday = haveToCheckOutCount(allocatedRooms);
+
+  const todayCheckedIn = getTodayCheckedIn(allocatedRooms);
+
+  console.log(todaysRooms, allocatedRooms);
+
   const [isOpenQA, setIsOpenQA] = useState(false);
   useGSAP(() => {
     gsap.set("#qa", {
@@ -19,7 +56,7 @@ const Dashboard = () => {
     if (isOpenQA) {
       gsap.to("#qa", {
         opacity: 1,
-        width: "auto",
+        width: "600px",
         height: "auto",
         padding: "20px",
         ease: "bounce.out",
@@ -29,7 +66,6 @@ const Dashboard = () => {
       gsap.to(".btn", {
         stagger: 0.06,
         opacity: 1,
-
         xPercent: 0,
         duration: 1,
         ease: "power2.inOut",
@@ -38,41 +74,63 @@ const Dashboard = () => {
     }
   }, [isOpenQA]);
   return (
-    <section className="relative h-dvh flex gap-2">
-      <div className="grow-10 flex gap-2 h-full items-stretch">
-        <div className="bg-gray-100 rounded-2xl w-full flex-5 p-5 flex flex-col gap-2">
-          <h3 className=" font-semibold text-xl p-2">
+    <section className="relative h-dvh flex md:flex-row flex-col gap-2">
+      <div className="md:grow-10 flex flex-col md:flex-row gap-2 h-full md:items-stretch">
+        <div className="bg-gray-100 rounded-2xl md:w-full md:flex-5 p-5 flex flex-col gap-2">
+          <h3 className=" font-semibold text-sm uppercase p-2">
             Majestic Town - 401 (Overview)
           </h3>
-          <div className="bg-white rounded-2xl grid grid-cols-2 gap-2 p-2">
+          <div className="bg-white rounded-2xl flex md:flex-wrap gap-2 p-2">
             <Card
-              title={"Check Inns"}
+              title={"In-House"}
               icon={
                 "https://img.icons8.com/glyph-neue/64/FFFFFF/door-sensor-checked.png"
               }
               precentage={25}
               growUp={true}
-              count={34}
+              count={todayInHouse}
               bgColor="bg-green-100"
               iconBgColor="bg-green-700"
             />
             <Card
-              title={"Check Outs"}
+              title={"Have Check-Out"}
               icon={
                 "https://img.icons8.com/ios-filled/100/FFFFFF/pull-door.png"
               }
               precentage={23}
               growUp={false}
-              count={11}
+              count={haveToCheckoutToday}
               bgColor="bg-red-100"
               iconBgColor="bg-red-700"
             />
             <Card
+              title={"Checked-In"}
+              icon={
+                "https://img.icons8.com/ios-filled/100/FFFFFF/checked--v1.png"
+              }
+              precentage={23}
+              growUp={false}
+              count={todayCheckedIn}
+              bgColor="bg-purple-100"
+              iconBgColor="bg-purple-700"
+            />
+            {/* <Card
+              title={"Have Checked-In"}
+              icon={
+                "https://img.icons8.com/ios-filled/100/FFFFFF/break--v1.png"
+              }
+              precentage={23}
+              growUp={false}
+              count={todayCheckedIn}
+              bgColor="bg-orange-100"
+              iconBgColor="bg-orange-700"
+            /> */}
+            <Card
               title={"Available Rooms"}
               icon={"https://img.icons8.com/glyph-neue/64/FFFFFF/bed.png"}
-              precentage={29}
+              precentage={1}
               growUp={false}
-              count={21}
+              count={todayAvailableRooms}
               bgColor="bg-blue-100"
               iconBgColor="bg-blue-700"
             />
@@ -83,18 +141,16 @@ const Dashboard = () => {
               }
               precentage={34}
               growUp={true}
-              count={12}
+              count={todayReservations}
               bgColor="bg-yellow-100"
               iconBgColor="bg-yellow-700"
             />
           </div>
         </div>
-        <div className=" bg-gray-100 rounded-2xl w-full flex-7 flex flex-col gap-2 p-5">
-          <h3 className=" font-semibold text-xl p-2">Guest List</h3>
-          <Table />
-          {/* <div className="bg-white rounded-2xl grid grid-cols-2 gap-2 p-2">
+        <div className=" bg-gray-100 rounded-2xl md:w-full md:flex-7 flex flex-col gap-2 p-5">
+          <h3 className=" font-semibold text-sm uppercase p-2">Guest List</h3>
 
-          </div> */}
+          {allocatedRooms && <Table data={todaysRooms} />}
         </div>
       </div>
 
@@ -112,21 +168,7 @@ const Dashboard = () => {
           alt=""
           onClick={() => setIsOpenQA((prev) => !prev)}
         />
-        <div className="flex justify-between">
-          <h3 className=" font-semibold text-xl p-2 mb-2">Quick Actions</h3>
-        </div>
-        <div className=" flex gap-2 mb-2">
-          <Button
-            name="Check Inn"
-            style="btn bg-green-600 text-white px-2 p-1"
-          />
-          <Button name="Check Out" style="btn bg-red-600 text-white px-2 p-1" />
-          <Button
-            name="Reservation"
-            style="btn bg-yellow-600 text-white px-2 p-1"
-          />
-        </div>
-        <div className=" py-5">{/* <CheckInn /> */}</div>
+        <QuickActions />
       </div>
     </section>
   );

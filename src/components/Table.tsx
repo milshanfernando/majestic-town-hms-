@@ -1,43 +1,74 @@
-const Table = () => {
+import { haveToCheckIn, haveToCheckOut } from "../utility/functions";
+import type { AllocatedRoom } from "../utility/types";
+
+type Props = {
+  data: AllocatedRoom[];
+};
+
+const Table = ({ data }: Props) => {
   return (
     <div className="relative overflow-x-auto bg-white shadow-xs rounded-2xl">
-      <table className="w-full text-sm text-left rtl:text-right text-body">
-        <thead className="text-sm text-body border-b border-gray-300">
+      <table className="w-full text-xs text-left rtl:text-right text-body">
+        <thead className="text-xs text-body border-b border-gray-300">
           <tr>
-            <th scope="col" className="px-6 py-3 font-medium">
-              Product name
+            <th scope="col" className="px-6 py-2 font-medium">
+              Guest Name
             </th>
-            <th scope="col" className="px-6 py-3 font-medium">
-              Color
+            <th scope="col" className="px-6 py-2 font-medium">
+              Room
             </th>
-            <th scope="col" className="px-6 py-3 font-medium">
-              Category
+            <th scope="col" className="px-6 py-2 font-medium">
+              Type
             </th>
-            <th scope="col" className="px-6 py-3 font-medium">
-              Price
+            <th scope="col" className="px-6 py-2 font-medium">
+              Check In
             </th>
-            <th scope="col" className="px-6 py-3 font-medium">
-              <span className="sr-only">Edit</span>
+            <th scope="col" className="px-6 py-2 font-medium">
+              Check Out
+            </th>
+            <th scope="col" className="px-6 py-2 font-medium">
+              Due Amount
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr className=" border-b border-gray-300 hover:bg-gray-100">
-            <th
-              scope="row"
-              className="px-6 py-4 font-medium text-heading whitespace-nowrap"
-            >
-              Apple MacBook Pro 17"
-            </th>
-            <td className="px-6 py-4">Silver</td>
-            <td className="px-6 py-4">Laptop</td>
-            <td className="px-6 py-4">$2999</td>
-            <td className="px-6 py-4 text-right">
-              <a href="#" className="font-medium text-fg-brand hover:underline">
-                Edit
-              </a>
-            </td>
-          </tr>
+          {data?.map(
+            (
+              { room, type, guestName, checkIn, checkOut, dueAmount, status },
+              index
+            ) => (
+              <tr
+                className={` ${
+                  data.length == index + 1 ? "" : "border-b"
+                }   border-gray-300 hover:bg-gray-100 `}
+              >
+                <th
+                  scope="row"
+                  className="px-6 py-2 font-medium text-heading whitespace-nowrap"
+                >
+                  {guestName}
+                </th>
+                <td className="px-6 py-2">{room}</td>
+                <td className="px-6 py-2">{type}</td>
+                <td className="px-6 py-2 whitespace-nowrap">{checkIn}</td>
+                <td className="px-6 py-2 whitespace-nowrap">
+                  {" "}
+                  <span
+                    className={`${
+                      haveToCheckOut(status, checkOut)
+                        ? "bg-yellow-600 text-white px-2 rounded-full "
+                        : haveToCheckIn(status, checkIn) &&
+                          "bg-green-600 text-white px-2 rounded-full "
+                    } `}
+                  >
+                    {" "}
+                    {checkOut}
+                  </span>
+                </td>
+                <td className="px-6 py-2">{dueAmount}</td>
+              </tr>
+            )
+          )}
         </tbody>
       </table>
     </div>

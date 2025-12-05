@@ -4,7 +4,10 @@ type Props = {
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 const Button = ({ style, name, ...rest }: Props) => {
   return (
-    <button {...rest} className={` rounded-[10px] ${style} text-center`}>
+    <button
+      {...rest}
+      className={` hover:scale-105 rounded-[10px] ${style} text-center`}
+    >
       <p>{name}</p>
     </button>
   );
