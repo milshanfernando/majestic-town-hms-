@@ -18,9 +18,11 @@ const Card = ({
   count,
 }: Props) => {
   return (
-    <div className={`rounded-2xl p-5 ${bgColor} flex justify-between gap-5`}>
+    <div
+      className={`rounded-2xl p-5 ${bgColor} flex justify-between gap-5 flex-1`}
+    >
       <div className="flex flex-col gap-2">
-        <h3 className=" text-sm md:text-lg font-semibold">{title}</h3>
+        <h3 className=" text-xs md:text-sm font-bold">{title}</h3>
         <div
           className={`w-5 h-5 md:w-8 md:h-8 rounded-[6px] md:rounded-[10px] p-1 flex justify-center items-center ${iconBgColor}`}
         >

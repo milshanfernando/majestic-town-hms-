@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useHotelStore } from "../utility/store";
+import RoomAddModal from "./AddRoom";
+// import { useRooms } from "../hooks/useRooms";
 
 type Room = {
   roomNumber: number;
@@ -16,7 +18,9 @@ type Room = {
 
 const RoomsGrid = () => {
   const rooms = useHotelStore((state) => state.rooms);
+  // const { data: rooms, isLoading } = useRooms();
   const today = new Date();
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const getGuestStatus = (room: Room) => {
     if (!room.allocatedGuest) return "No guest allocated";
@@ -33,8 +37,23 @@ const RoomsGrid = () => {
   };
 
   return (
-    <div className="p-3">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800">Rooms Overview</h1>
+    <section className="p-3 overflow-auto">
+      {/* <h1 className="text-2xl font-bold mb-4 text-gray-800">Rooms Overview</h1> */}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-gray-800">Rooms Overview</h1>
+
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700"
+        >
+          + Add Room
+        </button>
+      </div>
+
+      <RoomAddModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {rooms.map((room) => (
@@ -134,7 +153,7 @@ const RoomsGrid = () => {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

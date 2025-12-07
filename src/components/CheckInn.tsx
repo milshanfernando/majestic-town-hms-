@@ -17,9 +17,9 @@ type Guest = {
 const CheckIn = () => {
   const { allocatedRooms, rooms, updateRoom, updateRoomStatus } =
     useHotelStore();
-
+  const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
   const notCheckedIn = allocatedRooms.filter(
-    (r) => r.status === "notCheckedIn"
+    (r) => r.status === "notCheckedIn" && r.checkIn === today
   );
 
   // NEW: only available rooms

@@ -1,178 +1,123 @@
 import React, { useState } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { rooms as initialRooms } from "../utility/data";
+import { useHotelStore } from "../utility/store";
 
-type Room = {
-  roomNumber: number;
-  type: string;
-  status: "Available" | "Occupied" | string;
-  price: number;
-  cleaningStatus: "Clean" | "Dirty" | string;
-  allocatedGuest: string | null;
-  guestId: string | null;
-  bookFrom: string | null;
-  fromDate: string | null;
-  toDate: string | null;
+type Props = {
+  isOpen: boolean;
+  onClose: () => void;
 };
 
-const AddRoomFormik: React.FC = () => {
-  const [rooms, setRooms] = useState<Room[]>(initialRooms);
+export default function RoomAddModal({ isOpen, onClose }: Props) {
+  const addRoom = useHotelStore((state) => state.addARoom);
 
-  const formik = useFormik({
-    initialValues: {
-      roomNumber: "",
-      type: "Single",
-      status: "Available",
-      price: "",
-      cleaningStatus: "Clean",
-    },
-    validationSchema: Yup.object({
-      roomNumber: Yup.number()
-        .required("Room number is required")
-        .integer("Must be an integer")
-        .positive("Must be positive"),
-      type: Yup.string()
-        .oneOf(["Single", "Double"])
-        .required("Room type required"),
-      status: Yup.string()
-        .oneOf(["Available", "Occupied"])
-        .required("Status required"),
-      price: Yup.number()
-        .required("Price is required")
-        .positive("Price must be positive"),
-      cleaningStatus: Yup.string()
-        .oneOf(["Clean", "Dirty"])
-        .required("Cleaning status required"),
-    }),
-    onSubmit: (values, { resetForm }) => {
-      const newRoom: Room = {
-        roomNumber: parseInt(values.roomNumber),
-        type: values.type,
-        status: values.status as "Available" | "Occupied",
-        price: parseFloat(values.price),
-        cleaningStatus: values.cleaningStatus as "Clean" | "Dirty",
-        allocatedGuest: null,
-        guestId: null,
-        bookFrom: null,
-        fromDate: null,
-        toDate: null,
-      };
-      setRooms((prev) => [...prev, newRoom]);
-      resetForm();
-    },
+  const [form, setForm] = useState({
+    roomNumber: "",
+    type: "",
+    status: "Available",
+    price: "",
+    cleaningStatus: "Clean",
   });
 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = () => {
+    if (!form.roomNumber || !form.type || !form.price) return;
+
+    addRoom({
+      roomNumber: Number(form.roomNumber),
+      type: form.type,
+      status: form.status,
+      price: Number(form.price),
+      cleaningStatus: form.cleaningStatus,
+      allocatedGuest: null,
+      guestId: null,
+      bookFrom: null,
+      fromDate: null,
+      toDate: null,
+    });
+
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div className="p-4 w-[400px] mx-auto bg-white shadow-md rounded-md">
-      <h2 className="text-xl font-bold mb-4">Add New Room</h2>
-      <form onSubmit={formik.handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1">Room Number</label>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl p-6 w-[90%] max-w-md shadow-xl">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">
+          Add New Room
+        </h2>
+
+        <div className="space-y-3">
           <input
-            type="number"
             name="roomNumber"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.roomNumber}
-            className="w-full border rounded px-2 py-1"
+            type="number"
+            placeholder="Room Number"
+            value={form.roomNumber}
+            onChange={handleChange}
+            className="w-full border p-2 rounded-lg"
           />
-          {formik.touched.roomNumber && formik.errors.roomNumber && (
-            <div className="text-red-500 text-sm">
-              {formik.errors.roomNumber}
-            </div>
-          )}
-        </div>
 
-        <div>
-          <label className="block mb-1">Type</label>
-          <select
+          <input
             name="type"
-            value={formik.values.type}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="w-full border rounded px-2 py-1"
-          >
-            <option value="Single">Single</option>
-            <option value="Double">Double</option>
-          </select>
-          {formik.touched.type && formik.errors.type && (
-            <div className="text-red-500 text-sm">{formik.errors.type}</div>
-          )}
-        </div>
+            type="text"
+            placeholder="Room Type (Single, Double...)"
+            value={form.type}
+            onChange={handleChange}
+            className="w-full border p-2 rounded-lg"
+          />
 
-        <div>
-          <label className="block mb-1">Status</label>
+          <input
+            name="price"
+            type="number"
+            placeholder="Price"
+            value={form.price}
+            onChange={handleChange}
+            className="w-full border p-2 rounded-lg"
+          />
+
           <select
             name="status"
-            value={formik.values.status}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="w-full border rounded px-2 py-1"
+            value={form.status}
+            onChange={handleChange}
+            className="w-full border p-2 rounded-lg"
           >
             <option value="Available">Available</option>
             <option value="Occupied">Occupied</option>
           </select>
-          {formik.touched.status && formik.errors.status && (
-            <div className="text-red-500 text-sm">{formik.errors.status}</div>
-          )}
-        </div>
 
-        <div>
-          <label className="block mb-1">Price</label>
-          <input
-            type="number"
-            name="price"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.price}
-            className="w-full border rounded px-2 py-1"
-          />
-          {formik.touched.price && formik.errors.price && (
-            <div className="text-red-500 text-sm">{formik.errors.price}</div>
-          )}
-        </div>
-
-        <div>
-          <label className="block mb-1">Cleaning Status</label>
           <select
             name="cleaningStatus"
-            value={formik.values.cleaningStatus}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="w-full border rounded px-2 py-1"
+            value={form.cleaningStatus}
+            onChange={handleChange}
+            className="w-full border p-2 rounded-lg"
           >
             <option value="Clean">Clean</option>
             <option value="Dirty">Dirty</option>
+            <option value="In Progress">In Progress</option>
           </select>
-          {formik.touched.cleaningStatus && formik.errors.cleaningStatus && (
-            <div className="text-red-500 text-sm">
-              {formik.errors.cleaningStatus}
-            </div>
-          )}
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-        >
-          Add Room
-        </button>
-      </form>
+        {/* Buttons */}
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg border border-gray-400"
+          >
+            Cancel
+          </button>
 
-      {/* <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-2">All Rooms</h3>
-        <ul className="space-y-2">
-          {rooms.map((room) => (
-            <li key={room.roomNumber} className="border p-2 rounded">
-              Room {room.roomNumber} - {room.type} - ${room.price} -{" "}
-              {room.status} - {room.cleaningStatus}
-            </li>
-          ))}
-        </ul>
-      </div> */}
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+          >
+            Add Room
+          </button>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default AddRoomFormik;
+}

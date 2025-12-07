@@ -1,13 +1,15 @@
 import { create } from "zustand";
-import type { AllocatedRoom, Room } from "./types";
+import type { AllocatedRoom, Guest, Room } from "./types";
 import {
   allocatedRooms as initialAllocatedRooms,
   rooms as initialRooms,
+  guests as initialGuests,
 } from "./data";
 
 interface AllocatedRoomState {
   rooms: Room[];
   allocatedRooms: AllocatedRoom[];
+  guests: Guest[];
 
   // actions
   addRoom: (room: AllocatedRoom) => void;
@@ -16,6 +18,7 @@ interface AllocatedRoomState {
   removeRoom: (guestId: string) => void;
   resetRooms: () => void;
 
+  addARoom: (room: Room) => void;
   updateRealRoom: (guestId: string, data: Partial<Room>) => void;
   updateRoomStatus: (roomNumber: number, data: Partial<Room>) => void;
 }
@@ -23,10 +26,15 @@ interface AllocatedRoomState {
 export const useHotelStore = create<AllocatedRoomState>((set) => ({
   rooms: initialRooms,
   allocatedRooms: initialAllocatedRooms,
+  guests: initialGuests,
 
   addRoom: (room) =>
     set((state) => ({
       allocatedRooms: [...state.allocatedRooms, room],
+    })),
+  addARoom: (room) =>
+    set((state) => ({
+      rooms: [...state.rooms, room],
     })),
 
   addRooms: (rooms) =>

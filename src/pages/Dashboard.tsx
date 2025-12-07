@@ -76,7 +76,7 @@ const Dashboard = () => {
   return (
     <section className="relative h-dvh flex md:flex-row flex-col gap-2">
       <div className="md:grow-10 flex flex-col md:flex-row gap-2 h-full md:items-stretch">
-        <div className="bg-gray-100 rounded-2xl md:w-full md:flex-5 p-5 flex flex-col gap-2">
+        <div className="bg-gray-100 rounded-2xl md:w-full md:flex-6 p-5 flex flex-col gap-2">
           <h3 className=" font-semibold text-sm uppercase p-2">
             Majestic Town - 401 (Overview)
           </h3>
@@ -93,7 +93,7 @@ const Dashboard = () => {
               iconBgColor="bg-green-700"
             />
             <Card
-              title={"Have Check-Out"}
+              title={"Check-Out"}
               icon={
                 "https://img.icons8.com/ios-filled/100/FFFFFF/pull-door.png"
               }
@@ -126,7 +126,7 @@ const Dashboard = () => {
               iconBgColor="bg-orange-700"
             /> */}
             <Card
-              title={"Available Rooms"}
+              title={"Available"}
               icon={"https://img.icons8.com/glyph-neue/64/FFFFFF/bed.png"}
               precentage={1}
               growUp={false}
@@ -147,7 +147,7 @@ const Dashboard = () => {
             />
           </div>
         </div>
-        <div className=" bg-gray-100 rounded-2xl md:w-full md:flex-7 flex flex-col gap-2 p-5">
+        <div className=" bg-gray-100 rounded-2xl md:w-full md:flex-6 flex flex-col gap-2 p-5">
           <h3 className=" font-semibold text-sm uppercase p-2">Guest List</h3>
 
           {allocatedRooms && <Table data={todaysRooms} />}
